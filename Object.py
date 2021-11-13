@@ -11,6 +11,6 @@ class Object:
     def json_default(value: Any) -> dict:
         if isinstance(value, datetime.date):
             return dict(year=value.year, month=value.month, day=value.day, hour=value.hour, minute=value.minute,
-                        second=value.second)
+                        second=value.second, microsecond=value.microsecond)
         else:
             return value.__dict__

@@ -1,15 +1,15 @@
 import datetime
 from dataclasses import dataclass, field
 from hashlib import sha256
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Optional
 
 from Object import Object
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)  # should be True but if we want to check if is_chain_valid() works - set to False
 class Block(Object):
     class_index: ClassVar[int] = 0
-    index: int = None  # calculated from class_index but initialized because of to_json order
+    index: Optional[int] = None  # calculated from class_index but initialized because of to_json order
     timestamp: datetime.datetime = datetime.datetime.now()
     data: Any = ''
     previous_hash: str = None
@@ -22,11 +22,3 @@ class Block(Object):
 
     def calculate_hash(self) -> str:
         return sha256(f'{self.index}{self.timestamp}{self.data}{self.previous_hash}'.encode('utf-8')).hexdigest()
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}' \
-               f'(index={self.index}, ' \
-               f'timestamp={self.timestamp}, ' \
-               f'data={self.data}, ' \
-               f'previous_hash={self.previous_hash}, ' \
-               f'hash={self.hash})'
