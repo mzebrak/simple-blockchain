@@ -6,7 +6,8 @@ from Object import Object
 
 
 class Blockchain(Object):
-    def __init__(self):
+    def __init__(self, difficulty: int = 0):
+        self.difficulty = difficulty if difficulty > 0 else 0
         self.chain = [self.create_genesis_block()]
 
     def get_latest_block(self) -> Block:
@@ -15,7 +16,7 @@ class Blockchain(Object):
     def add_block(self, timestamp: datetime = datetime.datetime.now(), data: Any = '', previous_hash: str = 'latest'):
         if previous_hash == 'latest':
             previous_hash = self.get_latest_block().hash
-        block = Block(timestamp=timestamp, data=data, previous_hash=previous_hash)
+        block = Block(timestamp=timestamp, data=data, previous_hash=previous_hash, difficulty=self.difficulty)
         self.chain.append(block)
 
     def is_chain_valid(self) -> bool:
@@ -28,7 +29,6 @@ class Blockchain(Object):
                 return False
         return True
 
-    @staticmethod
-    def create_genesis_block() -> Block:
+    def create_genesis_block(self) -> Block:
         timestamp = datetime.datetime(2020, 1, 1, 12, 00)
-        return Block(timestamp=timestamp, data='This is the genesis block')
+        return Block(timestamp=timestamp, data='This is the genesis block', difficulty=self.difficulty)
