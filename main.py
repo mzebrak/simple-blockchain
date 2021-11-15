@@ -1,52 +1,32 @@
-import datetime
-from dataclasses import FrozenInstanceError
-
 from Blockchain import Blockchain
-
-
-def print_blockchain(blockchain: Blockchain, additional: bool = False):
-    print("\nThis blockchain in JSON:")
-    print(blockchain.to_json())
-    if additional:
-        print(f'Second last block in chain: {blockchain.chain[-2]}')
-        print(f'Latest block in chain: {blockchain.get_latest_block()}')
-        print(f'Latest block in chain printed as json:\n{blockchain.get_latest_block().to_json()}')
-    print(f'Is blockchain valid?: {blockchain.is_chain_valid()}')
-
-
-def show_valid_blockchain(additional: bool = False):
-    print('\n----------------------------------\nshow_valid_blockchain()\n----------------------------------')
-    blockchain = Blockchain(difficulty=4)
-    blockchain.add_block(timestamp=datetime.datetime(2021, 11, 13, 12),
-                         data={'amount': 200},
-                         previous_hash='latest')
-    blockchain.add_block(timestamp=datetime.datetime.now(),
-                         data={'amount': 100},
-                         previous_hash='latest')
-
-    print_blockchain(blockchain, additional)
-
-
-def show_invalid_blockchain(additional: bool = False):
-    print('\n----------------------------------\nshow_invalid_blockchain()\n----------------------------------')
-    blockchain = Blockchain(difficulty=0)
-    blockchain.add_block(timestamp=datetime.datetime(2021, 11, 13, 12),
-                         data={'amount': 200},
-                         previous_hash='latest')
-
-    try:
-        obj = blockchain.chain[1]
-        obj.data = "newdata"
-        # obj.hash = obj.calculate_hash() # to make it valid again
-    except FrozenInstanceError:
-        raise SystemExit("block is immutable, change its frozen attribute")
-
-    print_blockchain(blockchain, additional)
+from Transaction import Transaction
 
 
 def main():
-    show_valid_blockchain(additional=False)
-    # show_invalid_blockchain(additional=False)
+    public_key = '028932ef0ce3145fe17dd1d28c4b3ec40ccd8d5e32875f3f2fef8d4761ec6eb5fd'
+    secret_key = '82605dccb6d509d60d4705b0399e6ab2aee6593a084585d41c63c6243fd9dda3'
+
+    blockchain = Blockchain(difficulty=4)
+
+    tx1 = Transaction(sender=public_key,
+                      recipent='public key goes here',
+                      amount=100)
+    print(tx1)
+
+    tx1.sign_transaction(sk_hex=secret_key)
+    print(f'tx1 signature: {tx1.signature}')
+    print(f'Is transaction valid?: {tx1.is_valid()}\n')
+
+    blockchain.add_transaction(tx1)
+
+    print(blockchain.get_address_balance(public_key))
+    blockchain.mine_pending_transactions(public_key)
+    print(blockchain.get_address_balance(public_key))
+
+    blockchain.mine_pending_transactions(public_key)
+    print(blockchain.get_address_balance(public_key))
+
+    print(f'\nIs chain valid?: {blockchain.is_chain_valid()}\n')
 
 
 if __name__ == '__main__':
