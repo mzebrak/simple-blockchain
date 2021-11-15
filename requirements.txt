@@ -1,4 +1,4 @@
-pip~=20.2.3
+pip~=21.3.1
 asn1crypto~=1.4.0
 coincurve~=15.0.1
 cffi~=1.15.0

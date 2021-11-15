@@ -6,4 +6,5 @@ a simple simulation of a blockchain network to better understand its operation
  > 2. cd simple-blockchain
  > 3. py -m venv venv
  > 4. venv/Scripts/activate.bat
- > 5. pip install -r ././requirements.txt
+ > 5. py -m pip install -r requirements.txt
+
