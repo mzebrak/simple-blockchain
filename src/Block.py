@@ -2,8 +2,8 @@ import datetime
 from dataclasses import dataclass
 from hashlib import sha256
 
-from Object import Object
-from Transaction import Transaction
+from .Object import Object
+from .Transaction import Transaction
 
 
 @dataclass()
@@ -21,7 +21,6 @@ class Block(Object):
 
     def mine_block(self, difficulty: int):
         print(f'Please wait... mining block')
-
         if difficulty < 1:
             self.hash = self.calculate_hash()
 
@@ -31,7 +30,7 @@ class Block(Object):
 
         print(f'Block mined in {self.nonce} iterations: {self.hash}')
 
-    def has_valid_transactions(self):
+    def has_valid_transactions(self) -> bool:
         for transaction in self.transactions:
             if not transaction.is_valid():
                 return False

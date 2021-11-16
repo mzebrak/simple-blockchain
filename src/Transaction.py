@@ -8,9 +8,9 @@ from coincurve import PrivateKey, PublicKey
 
 @dataclass
 class Transaction:
-    sender: Optional[str]
     recipent: str
-    amount: int
+    amount: float
+    sender: Optional[str] = None
     description: Optional[str] = None
     hash: str = ''
     signature: str = ''
@@ -18,10 +18,10 @@ class Transaction:
     def __post_init__(self):
         self.hash = self.calculate_hash()
 
-    def calculate_hash(self):
+    def calculate_hash(self) -> str:
         return sha256(f'{self.sender}{self.recipent}{self.amount}{self.description}'.encode('utf-8')).hexdigest()
 
-    def sign_transaction(self, sk_hex):
+    def sign_transaction(self, sk_hex: str):
         sk = PrivateKey().from_hex(sk_hex)
         pk_hex = sk.public_key.format().hex()
 
@@ -31,7 +31,7 @@ class Transaction:
         sig = sk.sign(binascii.unhexlify(self.hash))
         self.signature = sig.hex()
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         if self.sender is None:
             return True
 

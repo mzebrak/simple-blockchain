@@ -1,5 +1,5 @@
-from Blockchain import Blockchain
-from Transaction import Transaction
+from src.Blockchain import Blockchain
+from src.Transaction import Transaction
 
 
 def main():

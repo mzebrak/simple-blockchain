@@ -1,16 +1,16 @@
 import datetime
 
-from Block import Block
-from Object import Object
-from Transaction import Transaction
+from .Block import Block
+from .Object import Object
+from .Transaction import Transaction
 
 
 class Blockchain(Object):
-    def __init__(self, difficulty: int = 0):
+    def __init__(self, difficulty: int = 2):
         self.difficulty = difficulty if difficulty > 0 else 2
         self.chain = [self.create_genesis_block()]
-        self.pending_transactions = []
-        self.mining_reward = 100
+        self.pending_transactions: list = []
+        self.mining_reward: float = 100
 
     def create_genesis_block(self) -> Block:
         timestamp = datetime.datetime(2020, 1, 1, 12, 00)
@@ -26,14 +26,13 @@ class Blockchain(Object):
     def get_latest_block(self) -> Block:
         return self.chain[-1]
 
-    def mine_pending_transactions(self, miner_address):
+    def mine_pending_transactions(self, miner_address: str):
         block = Block(transactions=self.pending_transactions, previous_hash=self.get_latest_block().hash)
         block.mine_block(self.difficulty)
         self.chain.append(block)
         self.pending_transactions = [Transaction(sender=None, recipent=miner_address, amount=self.mining_reward)]
 
     def add_transaction(self, transaction: Transaction):
-
         if not transaction.sender or not transaction.recipent:
             raise ValueError('Transaction must include sender and recipient address')
 
@@ -45,7 +44,7 @@ class Blockchain(Object):
             raise ValueError(f'{transaction.sender} balance is too low: {sender_balance}')
         self.pending_transactions.append(transaction)
 
-    def get_address_balance(self, address):
+    def get_address_balance(self, address: str) -> float:
         balance = 0
         for block in self.chain:
             for transaction in block.transactions:
@@ -63,8 +62,11 @@ class Blockchain(Object):
             current_block = self.chain[i]
             previous_block = self.chain[i - 1]
 
-            # if not current_block.has_valid_transactions()\
+            if not current_block.has_valid_transactions():
+                return False
+
             if current_block.hash != current_block.calculate_hash() \
                     or current_block.previous_hash != previous_block.calculate_hash():
                 return False
-        return True
+
+            return True
