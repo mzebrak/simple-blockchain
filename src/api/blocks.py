@@ -13,4 +13,4 @@ def get_blocks():
 @blocks_api.route("/blocks/<hash>/", methods=['GET'])
 def get_block(hash):
     block = next((b for b in BlockchainManager.get_chain() if b.hash == str(hash)), None)
-    return jsonify(block if block else abort(404, f'No bock with given hash: {hash}'))
+    return jsonify(block if block else abort(404, f'No block with given hash: {hash}'))
