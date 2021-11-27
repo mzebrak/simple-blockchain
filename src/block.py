@@ -2,8 +2,8 @@ import datetime
 from dataclasses import dataclass, field
 from hashlib import sha256
 
-from .Object import Object
-from .Transaction import Transaction
+from .object import Object
+from .transaction import Transaction
 
 
 @dataclass()
@@ -36,12 +36,15 @@ class Block(Object):
 
         print(f'Block mined in {self.nonce} iterations: {self.hash}')
 
-    def has_valid_transactions(self) -> bool:
+    def is_valid(self) -> bool:
         """
         Checks if all of the transactions stored in chain are valid (have a sender, signature and are signed properly
         so the signature is valid)
         :return: True if valid, False if not
         """
+        if self.hash != self.calculate_hash():
+            return Fale
+
         for transaction in self.transactions:
             if not transaction.is_valid():
                 return False

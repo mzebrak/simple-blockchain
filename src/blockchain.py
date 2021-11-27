@@ -1,8 +1,9 @@
 import datetime
+from typing import Union
 
-from .Block import Block
-from .Object import Object
-from .Transaction import Transaction
+from .block import Block
+from .object import Object
+from .transaction import Transaction, TransactionType as tt
 
 
 class Blockchain(Object):
@@ -19,9 +20,10 @@ class Blockchain(Object):
         :return: Block object of the genesis block
         """
         timestamp = datetime.datetime(2020, 1, 1, 12, 00)
-        block = Block(previous_hash='',
+        block = Block(previous_hash='0',
                       timestamp=timestamp,
-                      transactions=[Transaction(sender='SYSTEM',
+                      transactions=[Transaction(tx_type=tt.SYSTEM,
+                                                timestamp=timestamp,
                                                 recipent='028932ef0ce3145fe17dd1d28c4b3ec40ccd8d5e32875f3f2fef8d4761ec6eb5fd',
                                                 amount=1000,
                                                 description='FIRST, GENESIS BLOCK')])
@@ -82,21 +84,29 @@ class Blockchain(Object):
 
         return balance
 
-    def get_wallet_transactions(self, address: str) -> list[Transaction]:
+    def get_wallet_transactions(self, address: str, tx_type: tt = tt.BOTH) -> Union[dict, list[Transaction]]:
         """
         Returns list of all wallet transactions stored in the blockchain, which contains given address as sender or
         recipient.
+        :param kind: INCOMING, OUTGOING or BOTH
         :param address: public wallet key
         :return: list of transactions of the provided address
         """
-        wallet_txs = []
+        transactions = {'incoming': [], 'outgoing': []}
         for block in self.chain:
             for tx in block.transactions:
-                if tx.sender == address or tx.recipent == address:
-                    wallet_txs.append(tx)
-        return wallet_txs  # dont know why but pythonic one line nested loop same as above doesnt work
+                if tx.sender == address:
+                    transactions['outgoing'].append(tx)
+                if tx.recipent == address:
+                    transactions['incoming'].append(tx)
 
-    def is_chain_valid(self) -> bool:
+        if tx_type == tt.INCOMING:
+            return transactions['incoming']
+        if tx_type == tt.OUTGOING:
+            return transactions['outgoing']
+        return transactions
+
+    def is_valid(self) -> bool:
         """
         Loops over all the blocks in the chain and verify if they are properly linked together and nobody has tampered
         with the hashes. By checking the blocks it also verifies the transactions inside of them
@@ -106,7 +116,7 @@ class Blockchain(Object):
             current_block = self.chain[i]
             previous_block = self.chain[i - 1]
 
-            if not current_block.has_valid_transactions():
+            if not current_block.is_valid():
                 return False
 
             if current_block.hash != current_block.calculate_hash() \

@@ -1,30 +1,41 @@
 import binascii
 import datetime
 from dataclasses import dataclass, field
+from enum import Enum
 from hashlib import sha256
 from typing import Optional
 
 from coincurve import PrivateKey, PublicKey
 
-from .Object import Object
+from .object import Object
 
 
-@dataclass()
+class TransactionType(str, Enum):
+    INCOMING = 'INCOMING'
+    OUTGOING = 'OUTGOING'
+    BOTH = 'BOTH'
+    SYSTEM = 'SYSTEM'
+    USER_DEFINED = 'USER_DEFINED'
+
+
+@dataclass
 class Transaction(Object):
     amount: float
     recipent: str
     sender: Optional[str] = None
+    tx_type: TransactionType = TransactionType.USER_DEFINED
     description: Optional[str] = None
-    timestamp: dict = field(init=False)
+    timestamp: datetime = datetime.datetime.now()  # timestamp: dict = field(init=False)
     hash: str = field(init=False)
-    signature: str = field(repr=False, init=False)
+
+    # signature: str = field(repr=False, init=False)
 
     def __post_init__(self):
         """
         After creating and initiating a transaction - add timestamp and calculate its hash
         """
         self.description = '' if self.description is None else self.description
-        self.timestamp = self.json_default(datetime.datetime.now())
+        # self.timestamp = self.json_default(datetime.datetime.now())
         self.hash = self.calculate_hash()
 
     def calculate_hash(self) -> str:
