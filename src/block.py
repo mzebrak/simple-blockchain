@@ -9,7 +9,7 @@ from .transaction import Transaction
 @dataclass()
 class Block(Object):
     previous_hash: str
-    timestamp: datetime.datetime = datetime.datetime.now()
+    timestamp: int
     transactions: list[Transaction] = field(default_factory=lambda: [])
     nonce: int = 0
     hash: str = field(init=False)

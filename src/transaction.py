@@ -22,10 +22,10 @@ class TransactionType(str, Enum):
 class Transaction(Object):
     amount: float
     recipent: str
-    sender: Optional[str] = None
+    sender: str
     tx_type: TransactionType = TransactionType.USER_DEFINED
     description: Optional[str] = None
-    timestamp: datetime = datetime.datetime.now()  # timestamp: dict = field(init=False)
+    timestamp: int = int(datetime.datetime.now().timestamp() * 1000)
     hash: str = field(init=False)
 
     # signature: str = field(repr=False, init=False)
@@ -64,7 +64,7 @@ class Transaction(Object):
         Check if transaction is valid (have a sender, signature and is signed properly so the signature is valid)
         :return: True if valid, False if not
         """
-        if self.sender is None:
+        if self.sender is 'SYSTEM':
             return True
 
         if not self.signature:

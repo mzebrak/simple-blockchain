@@ -19,11 +19,12 @@ class Blockchain(Object):
         did not contains the hash of previous block (previous_hash)
         :return: Block object of the genesis block
         """
-        timestamp = datetime.datetime(2020, 1, 1, 12, 00)
+        timestamp = datetime.datetime(2020, 1, 1, 12, 1, 54)
         block = Block(previous_hash='0',
-                      timestamp=timestamp,
+                      timestamp=int(timestamp.timestamp() * 1000),
                       transactions=[Transaction(tx_type=tt.SYSTEM,
-                                                timestamp=timestamp,
+                                                timestamp=int(timestamp.timestamp() * 1000),
+                                                sender='SYSTEM',
                                                 recipent='028932ef0ce3145fe17dd1d28c4b3ec40ccd8d5e32875f3f2fef8d4761ec6eb5fd',
                                                 amount=1000,
                                                 description='FIRST, GENESIS BLOCK')])
@@ -43,10 +44,15 @@ class Blockchain(Object):
         It also adds a transaction to send the mining reward to the given miner address.
         :param miner_address:
         """
-        block = Block(transactions=self.pending_transactions, previous_hash=self.get_latest_block().hash)
+        block = Block(transactions=self.pending_transactions,
+                      previous_hash=self.get_latest_block().hash,
+                      timestamp=int(datetime.datetime.now().timestamp() * 1000))
         block.mine_block(self.difficulty)
         self.chain.append(block)
-        self.pending_transactions = [Transaction(sender='SYSTEM', recipent=miner_address, amount=self.mining_reward,
+        self.pending_transactions = [Transaction(sender='SYSTEM',
+                                                 timestamp=int(datetime.datetime.now().timestamp() * 1000),
+                                                 recipent=miner_address,
+                                                 amount=self.mining_reward,
                                                  description='MINING REWARD')]
 
     def add_transaction(self, transaction: Transaction):
